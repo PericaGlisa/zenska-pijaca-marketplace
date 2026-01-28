@@ -1,0 +1,24 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7FA24A"/>
+      <stop offset="100%" stop-color="#5D7A32"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+  
+  <!-- Decorative Leaf Outline behind text -->
+  <path d="M256 50 C350 50 450 150 450 256 C450 380 350 462 256 462 C162 462 62 380 62 256 C62 150 162 50 256 50 Z" 
+        fill="none" stroke="#F2C94C" stroke-width="8" opacity="0.5"/>
+
+  <!-- Main Letter Ž -->
+  <text x="50%" y="62%" font-family="Playfair Display, serif" font-weight="bold" font-size="320" fill="#F9F7F2" text-anchor="middle" filter="url(#shadow)">Ž</text>
+  
+  <!-- Leaf Accent -->
+  <path d="M360 120 Q440 80 440 160 Q440 220 380 200 Q320 180 360 120" fill="#F2C94C" filter="url(#shadow)"/>
+</svg>

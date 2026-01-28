@@ -1,0 +1,71 @@
+# Netlify Configuration - Ženska Pijaca
+# Ovaj fajl označava sajt kao statički website za Netlify
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA Redirects - sve rute idu na index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Prerendering za SEO - označava kao website
+[build.processing]
+  skip_processing = false
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.images]
+  compress = true
+
+# Headers za SEO i sigurnost
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Sitemap headers
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml"
+    Cache-Control = "public, max-age=3600"
+
+# Robots.txt headers
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type = "text/plain"
+    Cache-Control = "public, max-age=86400"
+
+# OG Image headers za social sharing
+[[headers]]
+  for = "/og-image.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Access-Control-Allow-Origin = "*"
+
+# Context-specific settings
+[context.production]
+  environment = { NODE_ENV = "production" }
+
+[context.deploy-preview]
+  environment = { NODE_ENV = "development" }
+
+# Plugin za prerendering (opciono - pomaže SEO)
+# [[plugins]]
+#   package = "@netlify/plugin-lighthouse"
