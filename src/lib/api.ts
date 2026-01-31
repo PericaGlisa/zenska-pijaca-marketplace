@@ -1,4 +1,5 @@
 import { Product, Category } from "@/hooks/useProducts";
+import { transformGoogleDriveUrl } from "@/lib/imageOptimization";
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SPREADSHEET_ID;
