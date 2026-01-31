@@ -15,6 +15,7 @@ export const categoryPlaceholders: Record<string, string> = {
   "Povrće": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&h=600&fit=crop",
   "Orasi": "https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?w=600&h=600&fit=crop",
   "Bilje": "https://images.unsplash.com/photo-1515586838455-8f8c940d6853?w=600&h=600&fit=crop",
+  "Lekovito bilje": "https://images.unsplash.com/photo-1515586838455-8f8c940d6853?w=600&h=600&fit=crop",
   "Čajevi": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=600&h=600&fit=crop",
   "Prehrambeni Proizvodi": "https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=600&h=600&fit=crop",
   
