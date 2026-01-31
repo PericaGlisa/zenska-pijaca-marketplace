@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingBag, Send } from "lucide-react";
-import { useCart } from "@/hooks/useCart";
+import { useCart, type CartItem } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,7 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { getImageWithFallback } from "@/lib/categoryPlaceholders";
 import { getOptimizedUnsplashUrl } from "@/lib/imageOptimization";
 
-const CartItemImage = ({ item }: { item: any }) => {
+const CartItemImage = ({ item }: { item?: CartItem | null }) => {
   if (!item) return null;
 
   return (
@@ -38,6 +38,9 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     customerName: "",
     customerEmail: "",
     customerPhone: "",
+    customerAddress: "",
+    customerCity: "",
+    customerPostalCode: "",
     customerMessage: "",
   });
 
@@ -61,10 +64,17 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.customerName.trim() || !formData.customerEmail.trim()) {
+    if (
+      !formData.customerName.trim() ||
+      !formData.customerEmail.trim() ||
+      !formData.customerPhone.trim() ||
+      !formData.customerAddress.trim() ||
+      !formData.customerCity.trim() ||
+      !formData.customerPostalCode.trim()
+    ) {
       toast({
         title: "Greška",
-        description: "Molimo unesite ime i email adresu.",
+        description: "Molimo unesite ime, email, telefon i adresu.",
         variant: "destructive",
       });
       return;
@@ -80,13 +90,36 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
       return;
     }
 
+    const phone = formData.customerPhone.trim();
+    if (phone.length < 6) {
+      toast({
+        title: "Greška",
+        description: "Molimo unesite ispravan broj telefona.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const postalCode = formData.customerPostalCode.trim();
+    if (!/^\d{5}$/.test(postalCode)) {
+      toast({
+        title: "Greška",
+        description: "Poštanski broj mora imati 5 cifara.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const orderData = {
         customerName: formData.customerName.trim(),
         customerEmail: formData.customerEmail.trim(),
-        customerPhone: formData.customerPhone.trim(),
+        customerPhone: phone,
+        customerAddress: formData.customerAddress.trim(),
+        customerCity: formData.customerCity.trim(),
+        customerPostalCode: postalCode,
         customerMessage: formData.customerMessage.trim(),
         items: items.map((item) => ({
           id: item.id,
@@ -111,6 +144,9 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
         customerName: "",
         customerEmail: "",
         customerPhone: "",
+        customerAddress: "",
+        customerCity: "",
+        customerPostalCode: "",
         customerMessage: "",
       });
       onClose();
@@ -183,7 +219,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="customerPhone">Telefon</Label>
+                <Label htmlFor="customerPhone">Telefon *</Label>
                 <Input
                   id="customerPhone"
                   type="tel"
@@ -192,8 +228,53 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                     setFormData({ ...formData, customerPhone: e.target.value })
                   }
                   placeholder="+381 XX XXX XXXX"
+                  required
                   maxLength={20}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="customerAddress">Adresa *</Label>
+                <Input
+                  id="customerAddress"
+                  value={formData.customerAddress}
+                  onChange={(e) =>
+                    setFormData({ ...formData, customerAddress: e.target.value })
+                  }
+                  placeholder="Ulica i broj"
+                  required
+                  maxLength={200}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="customerCity">Grad *</Label>
+                  <Input
+                    id="customerCity"
+                    value={formData.customerCity}
+                    onChange={(e) =>
+                      setFormData({ ...formData, customerCity: e.target.value })
+                    }
+                    placeholder="Beograd"
+                    required
+                    maxLength={100}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="customerPostalCode">Poštanski broj *</Label>
+                  <Input
+                    id="customerPostalCode"
+                    value={formData.customerPostalCode}
+                    onChange={(e) =>
+                      setFormData({ ...formData, customerPostalCode: e.target.value })
+                    }
+                    placeholder="11000"
+                    required
+                    maxLength={5}
+                    inputMode="numeric"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">

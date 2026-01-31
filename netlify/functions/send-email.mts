@@ -37,6 +37,9 @@ export default async (req: Request, context: Context) => {
         <p><strong>Kupac:</strong> ${data.customerName}</p>
         <p><strong>Email:</strong> ${data.customerEmail}</p>
         <p><strong>Telefon:</strong> ${data.customerPhone}</p>
+        <p><strong>Adresa:</strong> ${data.customerAddress}</p>
+        <p><strong>Grad:</strong> ${data.customerCity}</p>
+        <p><strong>Poštanski broj:</strong> ${data.customerPostalCode}</p>
         <p><strong>Poruka:</strong> ${data.customerMessage}</p>
         <h4>Stavke:</h4>
         <ul>
@@ -68,6 +71,7 @@ export default async (req: Request, context: Context) => {
         const customerHtml = `
           <h3>Hvala na narudžbini, ${data.customerName}!</h3>
           <p>Uspešno smo primili vašu narudžbinu. Uskoro ćemo vas kontaktirati radi potvrde i slanja.</p>
+          <p><strong>Adresa za dostavu:</strong> ${data.customerAddress}, ${data.customerCity} ${data.customerPostalCode}</p>
           <h4>Vaša narudžbina:</h4>
           <ul>
             ${data.items.map((item: any) => `<li>${item.name} x ${item.quantity} - ${item.price} RSD</li>`).join("")}

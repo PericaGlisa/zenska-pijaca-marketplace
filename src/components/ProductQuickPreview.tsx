@@ -40,7 +40,7 @@ const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickP
       setIsLoaded(false);
       setHasError(false);
     }
-  }, [product?.id]);
+  }, [product]);
 
   // Clean text from file extensions
   const cleanText = useCallback((text: string | undefined) => {

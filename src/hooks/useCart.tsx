@@ -28,10 +28,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window !== "undefined") {
       try {
         const saved = localStorage.getItem("zp_cart");
-        const parsed = saved ? JSON.parse(saved) : [];
+        const parsed: unknown = saved ? JSON.parse(saved) : [];
         if (!Array.isArray(parsed)) return [];
-        // Filter out null/undefined items and ensure they have an id
-        return parsed.filter((item: any) => item && typeof item === 'object' && item.id);
+        const isValidCartItem = (value: unknown): value is CartItem => {
+          if (!value || typeof value !== "object") return false;
+          return "id" in value && typeof (value as { id?: unknown }).id === "string";
+        };
+        return parsed.filter(isValidCartItem);
       } catch (e) {
         console.error("Failed to load cart from localStorage", e);
         return [];

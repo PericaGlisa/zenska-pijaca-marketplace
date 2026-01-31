@@ -30,8 +30,9 @@ const NewsletterSection = () => {
       });
 
       setTimeout(() => setIsSubmitted(false), 3000);
-    } catch (err: any) {
-      console.error("Newsletter signup error:", err);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error("Unknown error");
+      console.error("Newsletter signup error:", error);
       toast({
         title: "Greška",
         description: "Došlo je do greške. Pokušajte ponovo.",

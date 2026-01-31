@@ -115,7 +115,7 @@ export const api = {
     return categories;
   },
 
-  async sendEmail(type: "contact" | "newsletter" | "order", data: any) {
+  async sendEmail(type: "contact" | "newsletter" | "order", data: unknown) {
     // Call Netlify Function
     const response = await fetch("/.netlify/functions/send-email", {
       method: "POST",

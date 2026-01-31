@@ -69,7 +69,7 @@ const SEOHead = ({
     setMetaTag("twitter:image", metaImage);
 
     // Update canonical URL
-    let canonical = document.querySelector('link[rel="canonical"]');
+    const canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) {
       canonical.setAttribute("href", metaUrl);
     }

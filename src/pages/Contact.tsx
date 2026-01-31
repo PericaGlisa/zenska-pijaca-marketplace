@@ -69,8 +69,9 @@ const Contact = () => {
       });
 
       setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (error: any) {
-      console.error("Error sending contact form:", error);
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error("Unknown error");
+      console.error("Error sending contact form:", err);
       toast({
         title: "Greška",
         description: "Došlo je do greške prilikom slanja poruke. Pokušajte ponovo.",
