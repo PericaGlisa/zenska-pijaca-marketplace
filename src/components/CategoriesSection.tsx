@@ -32,7 +32,7 @@ const CategoriesSection = () => {
   
   // Calculate product count per category
   const categoriesWithCount = categories.map(cat => {
-    const productCount = products.filter(p => p.category === cat.icon).length;
+    const productCount = products.filter(p => p.category === cat.name).length;
     return {
       ...cat,
       productCount,
