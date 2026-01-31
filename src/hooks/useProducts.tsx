@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 export interface Product {
   id: string;
@@ -33,36 +33,17 @@ export const useProducts = () => {
       setError(null);
 
       // Fetch products and categories in parallel
-      // Fetch products
-      const productsResponse = await supabase.functions.invoke("get-products");
-      
-      // Fetch categories using query param (edge function reads from URL)
-      const categoriesRes = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-products?type=categories`,
-        {
-          headers: {
-            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const categoriesData = await categoriesRes.json();
-      const categoriesResponse = { data: categoriesData, error: categoriesRes.ok ? null : categoriesData };
+      const [productsData, categoriesData] = await Promise.all([
+        api.getProducts(),
+        api.getCategories()
+      ]);
 
-      if (productsResponse.error) throw productsResponse.error;
-      if (categoriesResponse.error) throw categoriesResponse.error;
-
-      // Check if we got valid data or error responses
-      if (productsResponse.data?.error || categoriesResponse.data?.error) {
-        throw new Error(productsResponse.data?.error || categoriesResponse.data?.error);
-      }
-
-      setProducts(productsResponse.data || []);
-      setCategories(categoriesResponse.data || []);
+      setProducts(productsData);
+      setCategories(categoriesData);
     } catch (err) {
       console.error("Error fetching products:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch products");
-      // Fallback to mock data
+      // Fallback to mock data if API fails (or if spreadsheet ID is missing)
       setProducts(getMockProducts());
       setCategories(getMockCategories());
     } finally {

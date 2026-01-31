@@ -2,7 +2,7 @@ import { Send, Gift, Sparkles, Check, Mail, Star } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import FloatingElements from "./FloatingElements";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 const NewsletterSection = () => {
@@ -19,11 +19,7 @@ const NewsletterSection = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.functions.invoke("send-newsletter", {
-        body: { email },
-      });
-
-      if (error) throw error;
+      await api.sendEmail("newsletter", { email });
 
       setIsSubmitted(true);
       setEmail("");

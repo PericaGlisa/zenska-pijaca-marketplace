@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import SEOHead from "@/components/SEOHead";
 const contactInfo = [
   {
@@ -61,11 +61,7 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("send-contact", {
-        body: formData,
-      });
-
-      if (error) throw error;
+      await api.sendEmail("contact", formData);
 
       toast({
         title: "Poruka poslata!",
