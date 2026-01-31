@@ -9,6 +9,20 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { api } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { getImageWithFallback } from "@/lib/categoryPlaceholders";
+import { getOptimizedUnsplashUrl } from "@/lib/imageOptimization";
+
+const CartItemImage = ({ item }: { item: any }) => {
+  if (!item) return null;
+
+  return (
+    <img
+      src={getImageWithFallback(item.imageUrl, item.category)}
+      alt={item.name}
+      className="w-20 h-20 object-cover rounded-md"
+    />
+  );
+};
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -223,11 +237,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                   key={item.id}
                   className="flex gap-3 bg-muted/50 rounded-lg p-3"
                 >
-                  <img
-                    src={item.imageUrl}
-                    alt={item.name}
-                    className="w-20 h-20 object-cover rounded-md"
-                  />
+                  <CartItemImage item={item} />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-sm line-clamp-1">{item.name}</h4>
                     <p className="text-xs text-muted-foreground">{item.manufacturer}</p>

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { forwardRef, memo, useState, useCallback } from "react";
 import { useCart } from "@/hooks/useCart";
 import { getImageWithFallback } from "@/lib/categoryPlaceholders";
-import { getOptimizedUnsplashUrl } from "@/lib/imageOptimization";
+import { getOptimizedUnsplashUrl, getLowQualityPlaceholder } from "@/lib/imageOptimization";
 
 export interface ProductCardProps {
   id: string;
@@ -44,8 +44,8 @@ const ProductCard = memo(forwardRef<HTMLElement, ProductCardProps>(({
   const handleAddToCart = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (!available) return;
-    addItem({ id, name, price, manufacturer, imageUrl });
-  }, [available, addItem, id, name, price, manufacturer, imageUrl]);
+    addItem({ id, name, price, manufacturer, imageUrl, category });
+  }, [available, addItem, id, name, price, manufacturer, imageUrl, category]);
 
   const handlePreview = useCallback(() => {
     onPreview?.();
@@ -77,7 +77,7 @@ const ProductCard = memo(forwardRef<HTMLElement, ProductCardProps>(({
           <div 
             className="absolute inset-0 bg-muted animate-pulse"
             style={{
-              backgroundImage: `url(${getOptimizedUnsplashUrl(rawImage, 20, 10)})`,
+              backgroundImage: `url(${getLowQualityPlaceholder(rawImage)})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               filter: "blur(20px)",

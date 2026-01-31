@@ -75,11 +75,13 @@ const Footer = () => {
               whileHover={{ scale: 1.02 }}
               className="inline-block"
             >
-              <img 
-                src={logo} 
-                alt="Ženska Pijaca" 
-                className="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain"
-              />
+              <Link to="/">
+                <img 
+                  src={logo} 
+                  alt="Ženska Pijaca" 
+                  className="h-28 sm:h-32 md:h-40 lg:h-48 w-auto object-contain cursor-pointer"
+                />
+              </Link>
             </motion.div>
             <p className="text-primary-foreground/80 leading-relaxed text-base sm:text-lg">
               Online pijaca za domaće proizvođače i ženske preduzetnice. 

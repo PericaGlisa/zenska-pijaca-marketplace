@@ -189,8 +189,8 @@ const Products = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="name">Po imenu</SelectItem>
-                    <SelectItem value="price-asc">Cijena ↑</SelectItem>
-                    <SelectItem value="price-desc">Cijena ↓</SelectItem>
+                    <SelectItem value="price-asc">Cena ↑</SelectItem>
+                    <SelectItem value="price-desc">Cena ↓</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -266,8 +266,8 @@ const Products = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="name">Po imenu</SelectItem>
-                        <SelectItem value="price-asc">Cijena ↑</SelectItem>
-                        <SelectItem value="price-desc">Cijena ↓</SelectItem>
+                        <SelectItem value="price-asc">Cena ↑</SelectItem>
+                        <SelectItem value="price-desc">Cena ↓</SelectItem>
                       </SelectContent>
                     </Select>
 

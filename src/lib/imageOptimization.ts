@@ -105,26 +105,30 @@ export const getLowQualityPlaceholder = (url: string): string => {
   if (url.includes("unsplash.com")) {
     return getOptimizedUnsplashUrl(url, 20, 10) + "&blur=50";
   }
+  if (url.includes("drive.google.com")) {
+    return transformGoogleDriveUrl(url, 20);
+  }
   return url;
 };
 
 /**
  * Transform Google Drive share URLs to direct image URLs
  * @param url - Original URL
+ * @param width - Desired width (default 1000)
  */
-export const transformGoogleDriveUrl = (url: string): string => {
+export const transformGoogleDriveUrl = (url: string, width: number = 1000): string => {
   if (!url) return "";
   if (url.includes("drive.google.com")) {
     // Handle "file/d/ID/view" format
     const fileIdMatch = url.match(/\/d\/([^/]+)/);
     if (fileIdMatch && fileIdMatch[1]) {
       // Use thumbnail endpoint which is faster and reliable for images
-      return `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w1000`;
+      return `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w${width}`;
     }
     // Handle "id=ID" format
     const idParamMatch = url.match(/[?&]id=([^&]+)/);
     if (idParamMatch && idParamMatch[1]) {
-      return `https://drive.google.com/thumbnail?id=${idParamMatch[1]}&sz=w1000`;
+      return `https://drive.google.com/thumbnail?id=${idParamMatch[1]}&sz=w${width}`;
     }
   }
   return url;
