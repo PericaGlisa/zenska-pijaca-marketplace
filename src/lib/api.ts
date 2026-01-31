@@ -55,7 +55,8 @@ export const api = {
       id: row[0] || `sheet-cat-${index}`,
       name: row[1] || "Nova kategorija",
       description: row[2] || "",
-      icon: row[3] || "Package", 
+      // Apply Google Drive URL transformation to icon field as well, in case it's a link
+      icon: transformGoogleDriveUrl(row[3] || "Package"), 
       sort: Number(row[4]) || 0,
     }));
   },
