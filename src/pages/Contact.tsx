@@ -87,7 +87,7 @@ const Contact = () => {
       <SEOHead 
         title="Kontakt"
         description="Kontaktirajte Žensku Pijacu. Imate pitanje, sugestiju ili želite postati deo naše zajednice proizvođača? Javite nam se!"
-        url="https://zenska-pijaca.rs/kontakt"
+        url="https://zenskapijaca.rs/kontakt"
       />
       <Header />
       <main className="pt-24 pb-16">

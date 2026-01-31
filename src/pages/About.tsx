@@ -45,7 +45,7 @@ const About = () => {
       <SEOHead 
         title="O Nama"
         description="Ženska Pijaca je platforma koja povezuje talentovane žene preduzetnice i lokalne proizvođače sa kupcima koji cene autentičnost, kvalitet i tradiciju."
-        url="https://zenska-pijaca.rs/o-nama"
+        url="https://zenskapijaca.rs/o-nama"
       />
       <Header />
       <main className="pt-24 pb-16">

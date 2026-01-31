@@ -19,7 +19,7 @@ const Categories = () => {
       <SEOHead 
         title="Kategorije"
         description="Istražite kategorije domaćih proizvoda na Ženskoj Pijaci: organska hrana, prirodna kozmetika, med, džemovi, sapuni, rukotvorine i još mnogo toga."
-        url="https://zenska-pijaca.rs/kategorije"
+        url="https://zenskapijaca.rs/kategorije"
       />
       <Header />
       <main className="pt-24 pb-16">

@@ -1,5 +1,5 @@
 # Ženska Pijaca - robots.txt
-# https://zenska-pijaca.rs
+# https://zenskapijaca.rs
 
 # Google
 User-agent: Googlebot
@@ -38,7 +38,7 @@ Disallow: /_
 Disallow: /admin/
 
 # Sitemap location
-Sitemap: https://zenska-pijaca.rs/sitemap.xml
+Sitemap: https://zenskapijaca.rs/sitemap.xml
 
 # Host
-Host: https://zenska-pijaca.rs
+Host: https://zenskapijaca.rs

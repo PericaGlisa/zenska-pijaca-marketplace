@@ -12,7 +12,7 @@ const Index = () => {
       <SEOHead 
         title="Početna"
         description="Ženska Pijaca - online tržnica ručno izrađenih proizvoda od srpskih preduzetnica. Organska hrana, prirodna kozmetika, med, džemovi i rukotvorine."
-        url="https://zenska-pijaca.rs/"
+        url="https://zenskapijaca.rs/"
       />
       <Header />
       <main>

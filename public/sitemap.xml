@@ -6,7 +6,7 @@
   
   <!-- Početna stranica -->
   <url>
-    <loc>https://zenska-pijaca.rs/</loc>
+    <loc>https://zenskapijaca.rs/</loc>
     <lastmod>2026-01-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
   
   <!-- Proizvodi -->
   <url>
-    <loc>https://zenska-pijaca.rs/proizvodi</loc>
+    <loc>https://zenskapijaca.rs/proizvodi</loc>
     <lastmod>2026-01-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -22,7 +22,7 @@
   
   <!-- Kategorije -->
   <url>
-    <loc>https://zenska-pijaca.rs/kategorije</loc>
+    <loc>https://zenskapijaca.rs/kategorije</loc>
     <lastmod>2026-01-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -30,7 +30,7 @@
   
   <!-- O nama -->
   <url>
-    <loc>https://zenska-pijaca.rs/o-nama</loc>
+    <loc>https://zenskapijaca.rs/o-nama</loc>
     <lastmod>2026-01-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -38,7 +38,7 @@
   
   <!-- Kontakt -->
   <url>
-    <loc>https://zenska-pijaca.rs/kontakt</loc>
+    <loc>https://zenskapijaca.rs/kontakt</loc>
     <lastmod>2026-01-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -46,7 +46,7 @@
   
   <!-- FAQ -->
   <url>
-    <loc>https://zenska-pijaca.rs/faq</loc>
+    <loc>https://zenskapijaca.rs/faq</loc>
     <lastmod>2026-01-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

@@ -127,7 +127,7 @@ const Products = () => {
       <SEOHead 
         title="Proizvodi"
         description="Pregledajte sve domaće proizvode na Ženskoj Pijaci. Organska hrana, prirodna kozmetika, med, džemovi, sapuni i unikatne rukotvorine od lokalnih proizvođača."
-        url="https://zenska-pijaca.rs/proizvodi"
+        url="https://zenskapijaca.rs/proizvodi"
       />
       <Header />
       <main className="pt-24 pb-16">

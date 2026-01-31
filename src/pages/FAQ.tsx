@@ -99,7 +99,7 @@ const FAQ = () => {
       <SEOHead 
         title="Često Postavljana Pitanja"
         description="Pronađite odgovore na najčešća pitanja o Ženskoj Pijaci: naručivanje, dostava, plaćanje, proizvodi, povrat i kako postati deo naše zajednice proizvođača."
-        url="https://zenska-pijaca.rs/faq"
+        url="https://zenskapijaca.rs/faq"
       />
       <Header />
       <main className="pt-24 pb-16">
