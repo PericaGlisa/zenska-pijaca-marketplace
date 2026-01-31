@@ -107,3 +107,25 @@ export const getLowQualityPlaceholder = (url: string): string => {
   }
   return url;
 };
+
+/**
+ * Transform Google Drive share URLs to direct image URLs
+ * @param url - Original URL
+ */
+export const transformGoogleDriveUrl = (url: string): string => {
+  if (!url) return "";
+  if (url.includes("drive.google.com")) {
+    // Handle "file/d/ID/view" format
+    const fileIdMatch = url.match(/\/d\/([^/]+)/);
+    if (fileIdMatch && fileIdMatch[1]) {
+      // Use thumbnail endpoint which is faster and reliable for images
+      return `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w1000`;
+    }
+    // Handle "id=ID" format
+    const idParamMatch = url.match(/[?&]id=([^&]+)/);
+    if (idParamMatch && idParamMatch[1]) {
+      return `https://drive.google.com/thumbnail?id=${idParamMatch[1]}&sz=w1000`;
+    }
+  }
+  return url;
+};

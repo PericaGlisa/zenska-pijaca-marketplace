@@ -29,7 +29,7 @@ export const api = {
       category: row[3] || "Ostalo",
       manufacturer: row[4] || "",
       price: Number(row[5]?.replace(/[^0-9.-]+/g,"")) || 0,
-      imageUrl: row[6] || "",
+      imageUrl: transformGoogleDriveUrl(row[6] || ""),
       available: (row[7]?.toLowerCase() === "true" || row[7]?.toLowerCase() === "da"),
       manufacturerUrl: row[8] || "",
     }));
