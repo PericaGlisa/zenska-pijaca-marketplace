@@ -38,7 +38,23 @@ export const useProducts = () => {
         api.getCategories()
       ]);
 
-      setProducts(productsData);
+      // Map product category identifier (which might be an icon filename like 'med.png' or an ID) 
+      // to the actual Category Name (e.g., 'Med i proizvodi od meda')
+      const mappedProducts = productsData.map(product => {
+        // Try to find category by matching the product's category field against category icon OR name OR id
+        const matchedCategory = categoriesData.find(c => 
+          c.icon === product.category || 
+          c.name === product.category || 
+          c.id === product.category
+        );
+        
+        return {
+          ...product,
+          category: matchedCategory ? matchedCategory.name : product.category
+        };
+      });
+
+      setProducts(mappedProducts);
       setCategories(categoriesData);
     } catch (err) {
       console.error("Error fetching products:", err);
