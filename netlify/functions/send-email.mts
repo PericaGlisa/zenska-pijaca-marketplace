@@ -32,6 +32,12 @@ export default async (req: Request, context: Context) => {
       html = `<p>Korisnik <strong>${data.email}</strong> se prijavio za newsletter.</p>`;
     } else if (type === "order") {
       subject = "Nova narudžbina!";
+      const itemsTotalLine = typeof data.itemsTotal === "number"
+        ? `<p><strong>Međuzbir:</strong> ${data.itemsTotal} RSD</p>`
+        : "";
+      const shippingLine = typeof data.shippingPrice === "number"
+        ? `<p><strong>Dostava:</strong> ${data.shippingPrice} RSD</p>`
+        : "";
       html = `
         <h3>Detalji narudžbine</h3>
         <p><strong>Kupac:</strong> ${data.customerName}</p>
@@ -45,6 +51,8 @@ export default async (req: Request, context: Context) => {
         <ul>
           ${data.items.map((item: any) => `<li>${item.name} x ${item.quantity} - ${item.price} RSD</li>`).join("")}
         </ul>
+        ${itemsTotalLine}
+        ${shippingLine}
         <p><strong>Ukupno:</strong> ${data.totalPrice} RSD</p>
       `;
     } else {
@@ -68,6 +76,12 @@ export default async (req: Request, context: Context) => {
     if (type === "order" && data.customerEmail) {
       try {
         const customerSubject = "Potvrda narudžbine - Ženska Pijaca";
+        const customerItemsTotalLine = typeof data.itemsTotal === "number"
+          ? `<p><strong>Međuzbir:</strong> ${data.itemsTotal} RSD</p>`
+          : "";
+        const customerShippingLine = typeof data.shippingPrice === "number"
+          ? `<p><strong>Dostava:</strong> ${data.shippingPrice} RSD</p>`
+          : "";
         const customerHtml = `
           <h3>Hvala na narudžbini, ${data.customerName}!</h3>
           <p>Uspešno smo primili vašu narudžbinu. Uskoro ćemo vas kontaktirati radi potvrde i slanja.</p>
@@ -76,6 +90,8 @@ export default async (req: Request, context: Context) => {
           <ul>
             ${data.items.map((item: any) => `<li>${item.name} x ${item.quantity} - ${item.price} RSD</li>`).join("")}
           </ul>
+          ${customerItemsTotalLine}
+          ${customerShippingLine}
           <p><strong>Ukupno za naplatu:</strong> ${data.totalPrice} RSD</p>
           <hr>
           <p><small>Ovo je automatska poruka. Molimo vas da ne odgovarate na nju.</small></p>

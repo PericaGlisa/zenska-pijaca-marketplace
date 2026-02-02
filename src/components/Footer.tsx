@@ -84,7 +84,7 @@ const Footer = () => {
               </Link>
             </motion.div>
             <p className="text-primary-foreground/80 leading-relaxed text-base sm:text-lg">
-              Online pijaca za domaće proizvođače i ženske preduzetnice. 
+              Online pijaca za domaće proizvođače i poljoprivrednice. 
               Kupovina sa dušom! 💚
             </p>
             <motion.div 
@@ -190,7 +190,7 @@ const Footer = () => {
               </li>
               <li>
                 <motion.a
-                  href="tel:+381111234567"
+                  href="tel:+381648278384"
                   whileHover={{ x: 5 }}
                   className="flex items-center gap-3 sm:gap-4 text-primary-foreground/70 hover:text-white transition-all duration-300 group"
                 >
@@ -200,14 +200,14 @@ const Footer = () => {
                   >
                     <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                   </motion.div>
-                  <span className="text-sm sm:text-base md:text-lg">+381 11 123 4567</span>
+                  <span className="text-sm sm:text-base md:text-lg">+381 64 827 8384</span>
                 </motion.a>
               </li>
               <li className="flex items-center gap-3 sm:gap-4 text-primary-foreground/70">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/10 flex items-center justify-center">
                   <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                 </div>
-                <span className="text-sm sm:text-base md:text-lg">Beograd, Srbija</span>
+                <span className="text-sm sm:text-base md:text-lg">Kolubarski okrug</span>
               </li>
             </ul>
 

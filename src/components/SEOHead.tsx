@@ -11,7 +11,7 @@ interface SEOHeadProps {
 
 const defaultMeta = {
   title: "Ženska Pijaca — Kupuj Domaće, Podržavaj Lokalno",
-  description: "Online pijaca ručno izrađenih proizvoda od srpskih preduzetnica. Organska hrana, prirodna kozmetika, med, džemovi i unikatne rukotvorine.",
+  description: "Online pijaca ručno izrađenih proizvoda od srpskih poljoprivrednica. Organska hrana, prirodna kozmetika, med, džemovi i unikatne rukotvorine.",
   image: "https://zenskapijaca.rs/og-image.png",
   url: "https://zenskapijaca.rs/",
   siteName: "Ženska Pijaca",

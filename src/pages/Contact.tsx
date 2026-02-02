@@ -20,19 +20,19 @@ const contactInfo = [
   {
     icon: Phone,
     title: "Telefon",
-    value: "+381 60 123 4567",
-    href: "tel:+381601234567",
+    value: "+381 64 827 8384",
+    href: "tel:+381648278384",
   },
   {
     icon: MapPin,
     title: "Lokacija",
-    value: "Beograd, Srbija",
+    value: "Kolubarski okrug",
     href: "#",
   },
   {
     icon: Clock,
     title: "Radno Vreme",
-    value: "Pon - Pet: 9:00 - 17:00",
+    value: "Non-stop",
     href: "#",
   },
 ];

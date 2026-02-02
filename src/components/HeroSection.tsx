@@ -186,7 +186,7 @@ const HeroSection = () => {
                 variants={itemVariants}
                 className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed"
               >
-                Otkrijte jedinstvene proizvode domaćih proizvođača i ženskih preduzetnica. 
+                Otkrijte jedinstvene proizvode domaćih proizvođača i poljoprivrednica. 
                 Svaki proizvod nosi priču, ljubav i pažnju onih koji ga stvaraju.
               </motion.p>
 

@@ -17,7 +17,7 @@ const faqCategories = [
       {
         question: "Šta je Ženska Pijaca?",
         answer:
-          "Ženska Pijaca je online platforma koja povezuje kupce sa lokalnim proizvođačima i ženama preduzetnicama. Nudimo autentične, ručno izrađene i domaće proizvode direktno od proizvođača.",
+          "Ženska Pijaca je online platforma koja povezuje kupce sa lokalnim proizvođačima i poljoprivrednicama. Nudimo autentične, ručno izrađene i domaće proizvode direktno od proizvođača.",
       },
       {
         question: "Kako funkcioniše naručivanje?",
@@ -47,7 +47,7 @@ const faqCategories = [
       {
         question: "Koje načine plaćanja prihvatate?",
         answer:
-          "Trenutno prihvatamo plaćanje pouzećem (gotovina pri preuzimanju). Uskoro ćemo omogućiti i online plaćanje karticama.",
+          "Plaćanje je moguće gotovinom pri preuzimanju ili karticama putem POS terminala.",
       },
     ],
   },

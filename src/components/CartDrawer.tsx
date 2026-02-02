@@ -29,6 +29,194 @@ interface CartDrawerProps {
   onClose: () => void;
 }
 
+const shippingRates: Record<string, number> = {
+  "11000": 300,
+  "11010": 300,
+  "11011": 300,
+  "11012": 300,
+  "11016": 300,
+  "11030": 300,
+  "11032": 300,
+  "11040": 300,
+  "11041": 300,
+  "11042": 300,
+  "11043": 300,
+  "11050": 300,
+  "11051": 300,
+  "11052": 300,
+  "11053": 350,
+  "11054": 300,
+  "11055": 300,
+  "11056": 300,
+  "11060": 300,
+  "11061": 300,
+  "11062": 300,
+  "11070": 300,
+  "11071": 300,
+  "11072": 300,
+  "11073": 300,
+  "11074": 300,
+  "11075": 300,
+  "11076": 300,
+  "11077": 300,
+  "11079": 300,
+  "11080": 300,
+  "11081": 300,
+  "11082": 300,
+  "11083": 300,
+  "11084": 300,
+  "11090": 300,
+  "11091": 300,
+  "11092": 300,
+  "11101": 300,
+  "11102": 300,
+  "11103": 300,
+  "11104": 300,
+  "11105": 300,
+  "11106": 300,
+  "11107": 300,
+  "11108": 300,
+  "11109": 300,
+  "11110": 300,
+  "11111": 300,
+  "11112": 300,
+  "11113": 300,
+  "11114": 300,
+  "11115": 300,
+  "11116": 300,
+  "11117": 300,
+  "11118": 300,
+  "11119": 300,
+  "11120": 300,
+  "11121": 300,
+  "11122": 300,
+  "11124": 300,
+  "11125": 300,
+  "11126": 300,
+  "11127": 300,
+  "11128": 300,
+  "11129": 300,
+  "11130": 350,
+  "11131": 300,
+  "11133": 300,
+  "11135": 300,
+  "11136": 300,
+  "11137": 300,
+  "11138": 300,
+  "11139": 300,
+  "11140": 300,
+  "11141": 300,
+  "11142": 300,
+  "11143": 300,
+  "11144": 300,
+  "11145": 300,
+  "11146": 300,
+  "11147": 300,
+  "11148": 300,
+  "11149": 300,
+  "11150": 300,
+  "11151": 300,
+  "11154": 300,
+  "11156": 300,
+  "11158": 300,
+  "11159": 300,
+  "11160": 300,
+  "11163": 300,
+  "11164": 300,
+  "11165": 300,
+  "11166": 300,
+  "11167": 300,
+  "11168": 300,
+  "11169": 300,
+  "11172": 300,
+  "11173": 300,
+  "11174": 300,
+  "11175": 300,
+  "11176": 300,
+  "11177": 300,
+  "11178": 300,
+  "11179": 300,
+  "11180": 47,
+  "11182": 300,
+  "11183": 300,
+  "11184": 300,
+  "11185": 300,
+  "11186": 300,
+  "11187": 300,
+  "11188": 300,
+  "11189": 300,
+  "11190": 300,
+  "11191": 300,
+  "11192": 300,
+  "11193": 300,
+  "11194": 400,
+  "11196": 300,
+  "11197": 300,
+  "11198": 300,
+  "11199": 300,
+  "11210": 350,
+  "11211": 400,
+  "11212": 400,
+  "11213": 400,
+  "11214": 400,
+  "11215": 400,
+  "11216": 400,
+  "11217": 350,
+  "11221": 300,
+  "11222": 300,
+  "11224": 400,
+  "11231": 300,
+  "11232": 300,
+  "11233": 400,
+  "11235": 400,
+  "11250": 300,
+  "11251": 300,
+  "11252": 300,
+  "11253": 300,
+  "11254": 300,
+  "11255": 300,
+  "11260": 400,
+  "11261": 400,
+  "11262": 400,
+  "11271": 300,
+  "11272": 300,
+  "11273": 300,
+  "11275": 300,
+  "11276": 300,
+  "11277": 300,
+  "11278": 300,
+  "11279": 300,
+  "11280": 300,
+  "11281": 300,
+  "11282": 300,
+  "11283": 300,
+  "11306": 400,
+  "11307": 400,
+  "11308": 400,
+  "11309": 400,
+  "11350": 350,
+  "11351": 400,
+  "11352": 400,
+  "11353": 400,
+  "11426": 300,
+  "11427": 300,
+  "11430": 400,
+  "11450": 300,
+  "11460": 400,
+  "11550": 300,
+  "11554": 300,
+  "11555": 300,
+  "11560": 300,
+  "11563": 300,
+  "11564": 300,
+  "11568": 300,
+  "14222": 300,
+  "14223": 300,
+  "14224": 300,
+  "14225": 300,
+  "14226": 400,
+};
+
 const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
   const navigate = useNavigate();
   const { items, removeItem, updateQuantity, clearCart, getTotalPrice } = useCart();
@@ -43,6 +231,12 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     customerPostalCode: "",
     customerMessage: "",
   });
+  const itemsTotal = getTotalPrice();
+  const postalCodeValue = formData.customerPostalCode.trim();
+  const isPostalCodeValid = /^\d{5}$/.test(postalCodeValue);
+  const shippingPrice = isPostalCodeValid ? shippingRates[postalCodeValue] ?? 350 : undefined;
+  const totalWithShipping = itemsTotal + (shippingPrice ?? 0);
+  const totalDisplay = shippingPrice !== undefined ? totalWithShipping : itemsTotal;
 
   // Disable body scroll when cart is open
   useEffect(() => {
@@ -109,6 +303,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
       });
       return;
     }
+    const shippingForPostalCode = shippingRates[postalCode] ?? 350;
 
     setIsSubmitting(true);
 
@@ -128,7 +323,9 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
           quantity: item.quantity,
           manufacturer: item.manufacturer,
         })),
-        totalPrice: getTotalPrice(),
+        itemsTotal: getTotalPrice(),
+        shippingPrice: shippingForPostalCode,
+        totalPrice: getTotalPrice() + shippingForPostalCode,
       };
       
       await api.sendEmail("order", orderData);
@@ -227,7 +424,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                   onChange={(e) =>
                     setFormData({ ...formData, customerPhone: e.target.value })
                   }
-                  placeholder="+381 XX XXX XXXX"
+                  placeholder="+381 64 827 8384"
                   required
                   maxLength={20}
                 />
@@ -302,12 +499,27 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                     <span>{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
                   </div>
                 ))}
-                <div className="border-t border-border pt-2 mt-2 flex justify-between font-semibold">
-                  <span>Ukupno:</span>
-                  <span className="text-primary">
-                    {getTotalPrice().toLocaleString("sr-RS")} RSD
+                <div className="border-t border-border pt-2 mt-2 flex justify-between text-sm">
+                  <span>Međuzbir:</span>
+                  <span>{itemsTotal.toLocaleString("sr-RS")} RSD</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>Dostava:</span>
+                  <span>
+                    {shippingPrice !== undefined
+                      ? `${shippingPrice.toLocaleString("sr-RS")} RSD`
+                      : "Unesite poštanski broj"}
                   </span>
                 </div>
+                <div className="border-t border-border pt-2 flex justify-between font-semibold">
+                  <span>Ukupno:</span>
+                  <span className="text-primary">
+                    {totalDisplay.toLocaleString("sr-RS")} RSD
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Plaćanje: gotovina pri preuzimanju ili kartica putem POS terminala.
+                </p>
               </div>
             </form>
           ) : (
@@ -364,7 +576,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Ukupno:</span>
               <span className="text-2xl font-display font-bold text-primary">
-                {getTotalPrice().toLocaleString("sr-RS")} RSD
+                {(showCheckout ? totalDisplay : itemsTotal).toLocaleString("sr-RS")} RSD
               </span>
             </div>
 

@@ -22,7 +22,7 @@ const values = [
     icon: Users,
     title: "Podrška Zajednici",
     description:
-      "Naša misija je osnažiti žene preduzetnice i lokalne proizvođače kroz direktan pristup tržištu.",
+      "Naša misija je osnažiti poljoprivrednice i lokalne proizvođače kroz direktan pristup tržištu.",
   },
   {
     icon: Award,
@@ -44,7 +44,7 @@ const About = () => {
     <div className="min-h-screen bg-background">
       <SEOHead 
         title="O Nama"
-        description="Ženska Pijaca je platforma koja povezuje talentovane žene preduzetnice i lokalne proizvođače sa kupcima koji cene autentičnost, kvalitet i tradiciju."
+        description="Ženska Pijaca je platforma koja povezuje talentovane poljoprivrednice i lokalne proizvođače sa kupcima koji cene autentičnost, kvalitet i tradiciju."
         url="https://zenskapijaca.rs/o-nama"
       />
       <Header />
@@ -62,12 +62,12 @@ const About = () => {
               </h1>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                 <strong>Ženska Pijaca</strong> je platforma koja povezuje talentovane
-                žene preduzetnice i lokalne proizvođače sa kupcima koji cene
+                poljoprivrednice i lokalne proizvođače sa kupcima koji cene
                 autentičnost, kvalitet i tradiciju.
               </p>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                 Nastali smo iz želje da stvorimo prostor gde domaći proizvodi
-                dobijaju zasluženu pažnju, a žene preduzetnice priliku da svoje
+                dobijaju zasluženu pažnju, a poljoprivrednice priliku da svoje
                 talente pretvore u održiv posao.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">

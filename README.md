@@ -4,7 +4,7 @@ Dobrodošli u Ženska Pijaca projekat.
 
 ## O projektu
 
-Online pijaca ručno izrađenih proizvoda od srpskih preduzetnica. Organska hrana, prirodna kozmetika, med, džemovi i unikatne rukotvorine.
+Online pijaca ručno izrađenih proizvoda od srpskih poljoprivrednica. Organska hrana, prirodna kozmetika, med, džemovi i unikatne rukotvorine.
 
 ## Kako pokrenuti projekat
 

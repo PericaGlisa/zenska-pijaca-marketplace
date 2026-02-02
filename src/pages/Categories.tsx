@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useProducts } from "@/hooks/useProducts";
-import { getPlaceholderForCategory } from "@/lib/categoryPlaceholders";
+import { getPlaceholderForCategory, isValidImageUrl } from "@/lib/categoryPlaceholders";
 import SEOHead from "@/components/SEOHead";
 
 const Categories = () => {
@@ -51,22 +51,26 @@ const Categories = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categories.map((category, index) => (
-                <motion.div
-                  key={category.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Link
-                    to={`/proizvodi?kategorija=${encodeURIComponent(category.name)}`}
-                    className="group block relative overflow-hidden rounded-2xl aspect-[3/2]"
+              {categories.map((category, index) => {
+                const backgroundImage = isValidImageUrl(category.icon)
+                  ? category.icon
+                  : getPlaceholderForCategory(category.name) || getPlaceholderForCategory(category.icon);
+                return (
+                  <motion.div
+                    key={category.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
                   >
+                    <Link
+                      to={`/proizvodi?kategorija=${encodeURIComponent(category.name)}`}
+                      className="group block relative overflow-hidden rounded-2xl aspect-[3/2]"
+                    >
                     {/* Background Image */}
                     <div
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                       style={{
-                        backgroundImage: `url(${getPlaceholderForCategory(category.name)})`,
+                        backgroundImage: `url(${backgroundImage})`,
                       }}
                     />
                     
@@ -91,9 +95,10 @@ const Categories = () => {
                         </span>
                       </div>
                     </div>
-                  </Link>
-                </motion.div>
-              ))}
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>

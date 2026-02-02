@@ -121,6 +121,7 @@ const CategoriesSection = () => {
                   name={category.name}
                   description={category.description}
                   icon={category.icon}
+                  imageUrl={category.icon}
                   productCount={category.productCount}
                 />
               </motion.div>

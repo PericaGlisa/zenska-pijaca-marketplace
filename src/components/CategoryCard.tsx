@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { getPlaceholderForCategory, getImageWithFallback } from "@/lib/categoryPlaceholders";
+import { getPlaceholderForCategory, isValidImageUrl } from "@/lib/categoryPlaceholders";
 
 interface CategoryCardProps {
   name: string;
@@ -11,8 +11,8 @@ interface CategoryCardProps {
 }
 
 const CategoryCard = ({ name, description, icon, productCount, imageUrl }: CategoryCardProps) => {
-  // Use name for better category matching, fallback to icon
-  const backgroundImage = imageUrl || getPlaceholderForCategory(name) || getPlaceholderForCategory(icon);
+  const resolvedImage = isValidImageUrl(imageUrl) ? imageUrl : isValidImageUrl(icon) ? icon : "";
+  const backgroundImage = resolvedImage || getPlaceholderForCategory(name) || getPlaceholderForCategory(icon);
   
   return (
     <motion.a
