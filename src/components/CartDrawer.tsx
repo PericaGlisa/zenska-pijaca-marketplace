@@ -255,6 +255,25 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
     navigate("/proizvodi");
   };
 
+  const bumpLocalOrderCounts = (cartItems: CartItem[]) => {
+    try {
+      const storageKey = "zp_order_counts_v1";
+      const raw = localStorage.getItem(storageKey);
+      const current: Record<string, number> = raw ? JSON.parse(raw) : {};
+      const next: Record<string, number> = { ...current };
+
+      cartItems.forEach((item) => {
+        const qty = Number(item.quantity) || 0;
+        if (!item.id || qty <= 0) return;
+        next[item.id] = (Number(next[item.id]) || 0) + qty;
+      });
+
+      localStorage.setItem(storageKey, JSON.stringify(next));
+    } catch {
+      return;
+    }
+  };
+
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -329,6 +348,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
       };
       
       await api.sendEmail("order", orderData);
+      bumpLocalOrderCounts(items);
 
       toast({
         title: "Narudžba poslata! ✅",
@@ -365,7 +385,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
         <SheetHeader className="p-4 border-b border-border">
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-primary" />
-            {showCheckout ? "Checkout" : "Vaša Korpa"}
+            {showCheckout ? "Plaćanje" : "Vaša Korpa"}
           </SheetTitle>
         </SheetHeader>
 
@@ -611,7 +631,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                 size="lg"
                 onClick={() => setShowCheckout(true)}
               >
-                Nastavi na checkout
+                Nastavi na plaćanje
               </Button>
             )}
           </div>

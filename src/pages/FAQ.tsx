@@ -17,7 +17,7 @@ const faqCategories = [
       {
         question: "Šta je Ženska Pijaca?",
         answer:
-          "Ženska Pijaca je online platforma koja povezuje kupce sa lokalnim proizvođačima i poljoprivrednicama. Nudimo autentične, ručno izrađene i domaće proizvode direktno od proizvođača.",
+          "Ženska Pijaca je online platforma koja povezuje kupce sa lokalnim proizvođačima i poljoprivrednicama. Nudimo autentične, ručno izrađene i domaće proizvode direktno od proizvođača. Žensko udruženje Kolubarskog okruga pokrenulo je platformu koja povezuje poljoprivrednice i kupce i omogućava prodaju domaćih proizvoda. Udruženje u okviru platforme pruža isključivo posredničke usluge koje su u potpunosti besplatne i ne naplaćuje korišćenje platforme niti učestvuje u zaradi od prodaje proizvoda.",
       },
       {
         question: "Kako funkcioniše naručivanje?",
@@ -37,12 +37,12 @@ const faqCategories = [
       {
         question: "Koje su opcije dostave?",
         answer:
-          "Nudimo dostavu na teritoriji cele Srbije putem kurirske službe. Dostava obično traje 2-5 radnih dana, zavisno od lokacije. Za Beograd je moguća i lična dostava.",
+          "Nudimo ličnu dostavu na teritoriji celog Beograda, koja se realizuje vikendom u organizaciji Ženske pijace. Kupci u petak ili subotu dobijaju poruku na ostavljeni broj telefona sa okvirnim vremenom isporuke. Ova vrsta dostave predstavlja direktnu podršku radu zajednice, jer se njenim plaćanjem podržava dalji razvoj i rad Ženske pijace. Za zimnice i proizvode koji nisu brzo kvarljivi dostupna je i dostava putem brzih pošta, kao i drugih vidova isporuke, u dogovoru sa kupcima.",
       },
       {
         question: "Koliko košta dostava?",
         answer:
-          "Cena dostave zavisi od težine paketa i destinacije. Za narudžbine preko 5000 RSD, dostava je besplatna. Tačnu cenu dostave možete videti prilikom naručivanja.",
+          "Cena dostave iznosi 300/350/400 dinara u zavisnosti od destinacije, odnosno lokacije na kojoj se vrši isporuka. Cena dostave je fiksna i ne povećava se u slučaju veće količine ili kilaže poručene robe.",
       },
       {
         question: "Koje načine plaćanja prihvatate?",
@@ -63,11 +63,6 @@ const faqCategories = [
         question: "Šta ako nisam zadovoljan/na proizvodom?",
         answer:
           "Vaše zadovoljstvo nam je prioritet. Ako niste zadovoljni proizvodom, kontaktirajte nas u roku od 7 dana od prijema i zajedno ćemo pronaći rešenje - zamenu ili povrat novca.",
-      },
-      {
-        question: "Da li proizvodi imaju rok trajanja?",
-        answer:
-          "Da, svi prehrambeni proizvodi imaju jasno istaknut rok trajanja. Preporučujemo da proverite rok trajanja prilikom prijema i da proizvode čuvate prema uputstvima proizvođača.",
       },
     ],
   },

@@ -27,6 +27,8 @@ interface ProductQuickPreviewProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const MAX_QUANTITY = 9999;
+
 const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickPreviewProps) => {
   const { addItem, isInCart, items } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -69,19 +71,27 @@ const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickP
     };
   }, [product]);
 
+  const clampQuantity = useCallback((value: number) => {
+    const parsed = Math.floor(Number(value));
+    const safe = Number.isFinite(parsed) ? parsed : 1;
+    return Math.min(MAX_QUANTITY, Math.max(1, safe));
+  }, []);
+
   const handleAddToCart = useCallback(() => {
     if (!product?.available) return;
-    for (let i = 0; i < quantity; i++) {
-      addItem({ 
-        id: product.id, 
-        name: product.name, 
-        price: product.price, 
-        manufacturer: product.manufacturer, 
-        imageUrl: product.imageUrl 
-      });
-    }
+    addItem(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        manufacturer: product.manufacturer,
+        imageUrl: product.imageUrl,
+        category: product.category,
+      },
+      clampQuantity(quantity)
+    );
     setQuantity(1);
-  }, [product, quantity, addItem]);
+  }, [product, quantity, addItem, clampQuantity]);
 
   const handleImageLoad = useCallback(() => {
     setIsLoaded(true);
@@ -265,15 +275,29 @@ const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickP
                 <div className="flex items-center gap-1 xs:gap-2 bg-muted/80 rounded-xl xs:rounded-2xl p-1 xs:p-1.5 w-fit">
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-lg xs:rounded-xl flex items-center justify-center hover:bg-background transition-colors"
                   >
                     <Minus className="w-4 h-4 xs:w-5 xs:h-5" />
                   </motion.button>
-                  <span className="w-10 xs:w-12 text-center font-bold text-base xs:text-lg">{quantity}</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={MAX_QUANTITY}
+                    step={1}
+                    inputMode="numeric"
+                    value={quantity}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      if (raw === "") return;
+                      setQuantity(clampQuantity(Number(raw)));
+                    }}
+                    onBlur={() => setQuantity((q) => clampQuantity(q))}
+                    className="w-14 xs:w-16 sm:w-20 h-9 xs:h-10 sm:h-12 text-center font-bold text-base xs:text-lg bg-transparent outline-none rounded-lg xs:rounded-xl border border-transparent focus:border-border focus:bg-background/70"
+                  />
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setQuantity(quantity + 1)}
+                    onClick={() => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1))}
                     className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-lg xs:rounded-xl flex items-center justify-center hover:bg-background transition-colors"
                   >
                     <Plus className="w-4 h-4 xs:w-5 xs:h-5" />

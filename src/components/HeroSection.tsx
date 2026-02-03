@@ -1,6 +1,6 @@
 import { ArrowRight, Leaf, Heart, Users, Sparkles, Star, ChevronDown } from "lucide-react";
 import { motion, type Variants, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import FloatingElements from "./FloatingElements";
 import MarqueeStrip from "./MarqueeStrip";
 
@@ -82,6 +82,7 @@ const marqueeItems = [
 
 const HeroSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  const [marqueeSpeed, setMarqueeSpeed] = useState(40);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
@@ -89,6 +90,34 @@ const HeroSection = () => {
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  useEffect(() => {
+    const mobileMql = window.matchMedia("(max-width: 639px)");
+    const tabletMql = window.matchMedia("(max-width: 1023px)");
+
+    const apply = () => {
+      if (mobileMql.matches) {
+        setMarqueeSpeed(18);
+        return;
+      }
+
+      if (tabletMql.matches) {
+        setMarqueeSpeed(24);
+        return;
+      }
+
+      setMarqueeSpeed(40);
+    };
+
+    apply();
+    mobileMql.addEventListener("change", apply);
+    tabletMql.addEventListener("change", apply);
+
+    return () => {
+      mobileMql.removeEventListener("change", apply);
+      tabletMql.removeEventListener("change", apply);
+    };
+  }, []);
 
   const scrollToProducts = () => {
     document.querySelector("#featured-products")?.scrollIntoView({ behavior: "smooth" });
@@ -195,12 +224,12 @@ const HeroSection = () => {
                 className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start"
               >
                 <motion.a 
-                  href="/proizvodi" 
+                  href="/kategorije" 
                   className="btn-primary inline-flex items-center justify-center gap-2 sm:gap-3 group text-base sm:text-lg"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <span>Pregledaj Proizvode</span>
+                  <span>Pogledaj Kategorije</span>
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1.5 transition-transform duration-300" />
                 </motion.a>
                 <motion.a 
@@ -324,7 +353,7 @@ const HeroSection = () => {
         <MarqueeStrip 
           items={marqueeItems} 
           className="text-muted-foreground"
-          speed={40}
+          speed={marqueeSpeed}
         />
       </div>
 

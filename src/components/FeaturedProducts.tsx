@@ -1,6 +1,6 @@
 import { ArrowRight, TrendingUp, Loader2 } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 import ProductQuickPreview from "./ProductQuickPreview";
 import { useProducts, type Product } from "@/hooks/useProducts";
@@ -35,10 +35,26 @@ const FeaturedProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   
-  // Show first 9 products as featured (prioritize available ones)
-  const featuredProducts = [...products]
-    .sort((a, b) => (b.available ? 1 : 0) - (a.available ? 1 : 0))
-    .slice(0, 9);
+  const localOrderCounts = useMemo(() => {
+    try {
+      const raw = localStorage.getItem("zp_order_counts_v1");
+      return (raw ? JSON.parse(raw) : {}) as Record<string, number>;
+    } catch {
+      return {} as Record<string, number>;
+    }
+  }, []);
+
+  const featuredProducts = useMemo(() => {
+    return [...products]
+      .sort((a, b) => {
+        const countA = Number(localOrderCounts[a.id]) || 0;
+        const countB = Number(localOrderCounts[b.id]) || 0;
+        if (countA !== countB) return countB - countA;
+        if (a.available !== b.available) return (b.available ? 1 : 0) - (a.available ? 1 : 0);
+        return a.name.localeCompare(b.name);
+      })
+      .slice(0, 9);
+  }, [products, localOrderCounts]);
 
   // Preload featured product images
   useEffect(() => {

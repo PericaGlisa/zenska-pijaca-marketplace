@@ -214,12 +214,18 @@ const Footer = () => {
             {/* Social Links */}
             <div className="flex gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
               {[
-                { icon: Facebook, label: "Facebook" },
-                { icon: Instagram, label: "Instagram" },
-              ].map(({ icon: Icon, label }) => (
+                {
+                  icon: Facebook,
+                  label: "Facebook",
+                  href: "https://www.facebook.com/p/%C5%BDenska-pijaca-100076473301474/",
+                },
+                { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/zenska_pijaca/" },
+              ].map(({ icon: Icon, label, href }) => (
                 <motion.a
                   key={label}
-                  href="#"
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer noopener"
                   whileTap={{ scale: 0.95 }}
                   whileHover={{ scale: 1.1 }}
                   className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-white/10 hover:bg-accent/20 rounded-xl sm:rounded-2xl flex items-center justify-center transition-all duration-300 group"
