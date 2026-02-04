@@ -97,12 +97,12 @@ const HeroSection = () => {
 
     const apply = () => {
       if (mobileMql.matches) {
-        setMarqueeSpeed(18);
+        setMarqueeSpeed(8);
         return;
       }
 
       if (tabletMql.matches) {
-        setMarqueeSpeed(24);
+        setMarqueeSpeed(12);
         return;
       }
 

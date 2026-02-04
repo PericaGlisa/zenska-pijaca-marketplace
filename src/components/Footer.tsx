@@ -28,6 +28,10 @@ const Footer = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const scrollToTopImmediate = () => {
+    requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: "auto" }));
+  };
+
   return (
     <footer className="relative overflow-hidden">
       {/* Section Divider at top */}
@@ -116,6 +120,7 @@ const Footer = () => {
                   <motion.div whileHover={{ x: 8 }}>
                     <Link
                       to={item.href}
+                      onClick={item.href === "/kategorije" ? scrollToTopImmediate : undefined}
                       className="text-primary-foreground/70 hover:text-white transition-all duration-300 inline-flex items-center gap-2 sm:gap-3 group text-sm sm:text-base md:text-lg"
                     >
                       <motion.span
@@ -149,6 +154,7 @@ const Footer = () => {
                   <motion.div whileHover={{ x: 8 }}>
                     <Link
                       to={item.href}
+                      onClick={scrollToTopImmediate}
                       className="text-primary-foreground/70 hover:text-white transition-all duration-300 inline-flex items-center gap-2 sm:gap-3 group text-sm sm:text-base md:text-lg"
                     >
                       <motion.span
@@ -190,7 +196,7 @@ const Footer = () => {
               </li>
               <li>
                 <motion.a
-                  href="tel:+381648278384"
+                  href="tel:+381621029770"
                   whileHover={{ x: 5 }}
                   className="flex items-center gap-3 sm:gap-4 text-primary-foreground/70 hover:text-white transition-all duration-300 group"
                 >
@@ -200,7 +206,7 @@ const Footer = () => {
                   >
                     <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                   </motion.div>
-                  <span className="text-sm sm:text-base md:text-lg">+381 64 827 8384</span>
+                  <span className="text-sm sm:text-base md:text-lg">+381621029770</span>
                 </motion.a>
               </li>
               <li className="flex items-center gap-3 sm:gap-4 text-primary-foreground/70">

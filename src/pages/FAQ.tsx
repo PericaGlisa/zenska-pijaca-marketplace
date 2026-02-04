@@ -75,11 +75,6 @@ const faqCategories = [
           "Kontaktirajte nas putem email-a info@zenskapijaca.rs sa informacijama o vašim proizvodima. Nakon pregleda, zakazaćemo razgovor i objasniti vam uslove saradnje.",
       },
       {
-        question: "Koje su naknade za proizvođače?",
-        answer:
-          "Uzimamo malu proviziju od svake prodaje koja pokriva troškove platforme, marketinga i podrške. Tačni uslovi se dogovaraju individualno sa svakim proizvođačem.",
-      },
-      {
         question: "Da li mogu sam/a određivati cene?",
         answer:
           "Da, vi kao proizvođač određujete maloprodajnu cenu svojih proizvoda. Mi ćemo vam pomoći sa savetima o optimalnom pozicioniranju na tržištu.",

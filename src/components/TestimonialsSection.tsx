@@ -10,6 +10,7 @@ const testimonials = [
     text: "Probao sam med od maslačka i zaista sam zadovoljan kvalitetom. Vidi se da je domaći proizvod, bez industrijskog šmeka, i sigurno bih ga ponovo kupio.",
     rating: 5,
     product: "Med od maslačka",
+    boughtLabel: "Kupio",
     avatar: "MS",
     color: "primary",
   },
@@ -20,6 +21,7 @@ const testimonials = [
     text: "Ovde naručujemo još od 2021. godine, obično naručim veću količinu u četvrtak i već u nedelju stiže sveže, pa cela porodica jede pravu, zdravu hranu sa sela.",
     rating: 5,
     product: "Paket sveže hrane",
+    boughtLabel: "Kupila",
     avatar: "PJ",
     color: "accent",
   },
@@ -30,6 +32,7 @@ const testimonials = [
     text: "Imate zimnice kakve nisam jeo još od kada sam se preselio u Beograd, kvalitet i ukus podsećaju na domaće iz detinjstva. Podrška ženama iz Mionice i samo napred.",
     rating: 5,
     product: "Domaća zimnica",
+    boughtLabel: "Kupio",
     avatar: "MP",
     color: "secondary",
   },
@@ -171,7 +174,7 @@ const TestimonialsSection = () => {
                 <div className="mb-4 xs:mb-5 sm:mb-6">
                   <span className="text-[10px] xs:text-xs font-semibold text-muted-foreground bg-muted/80 px-2 xs:px-3 sm:px-4 py-1 xs:py-1.5 sm:py-2 rounded-full inline-flex items-center gap-1 xs:gap-1.5 sm:gap-2">
                     <Sparkles className="w-2.5 h-2.5 xs:w-3 xs:h-3" />
-                    Kupila: {testimonial.product}
+                    {testimonial.boughtLabel}: {testimonial.product}
                   </span>
                 </div>
 

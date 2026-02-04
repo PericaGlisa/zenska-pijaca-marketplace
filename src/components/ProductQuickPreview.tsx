@@ -32,6 +32,7 @@ const MAX_QUANTITY = 9999;
 const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickPreviewProps) => {
   const { addItem, isInCart, items } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [quantityText, setQuantityText] = useState("1");
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -39,6 +40,7 @@ const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickP
   useEffect(() => {
     if (product) {
       setQuantity(1);
+      setQuantityText("1");
       setIsLoaded(false);
       setHasError(false);
     }
@@ -79,6 +81,7 @@ const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickP
 
   const handleAddToCart = useCallback(() => {
     if (!product?.available) return;
+    const desiredQuantity = quantityText === "" ? 1 : clampQuantity(Number(quantityText));
     addItem(
       {
         id: product.id,
@@ -88,10 +91,11 @@ const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickP
         imageUrl: product.imageUrl,
         category: product.category,
       },
-      clampQuantity(quantity)
+      desiredQuantity
     );
     setQuantity(1);
-  }, [product, quantity, addItem, clampQuantity]);
+    setQuantityText("1");
+  }, [product, quantityText, addItem, clampQuantity]);
 
   const handleImageLoad = useCallback(() => {
     setIsLoaded(true);
@@ -275,7 +279,13 @@ const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickP
                 <div className="flex items-center gap-1 xs:gap-2 bg-muted/80 rounded-xl xs:rounded-2xl p-1 xs:p-1.5 w-fit">
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    onClick={() =>
+                      setQuantity((q) => {
+                        const next = Math.max(1, q - 1);
+                        setQuantityText(String(next));
+                        return next;
+                      })
+                    }
                     className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-lg xs:rounded-xl flex items-center justify-center hover:bg-background transition-colors"
                   >
                     <Minus className="w-4 h-4 xs:w-5 xs:h-5" />
@@ -286,18 +296,34 @@ const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickP
                     max={MAX_QUANTITY}
                     step={1}
                     inputMode="numeric"
-                    value={quantity}
+                    value={quantityText}
                     onChange={(e) => {
-                      const raw = e.target.value;
-                      if (raw === "") return;
-                      setQuantity(clampQuantity(Number(raw)));
+                      const nextText = e.target.value.replace(/[^\d]/g, "");
+                      setQuantityText(nextText);
+                      if (nextText === "") return;
+                      setQuantity(clampQuantity(Number(nextText)));
                     }}
-                    onBlur={() => setQuantity((q) => clampQuantity(q))}
+                    onBlur={() => {
+                      const nextQty = quantityText === "" ? 1 : clampQuantity(Number(quantityText));
+                      setQuantity(nextQty);
+                      setQuantityText(String(nextQty));
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.currentTarget.blur();
+                      }
+                    }}
                     className="w-14 xs:w-16 sm:w-20 h-9 xs:h-10 sm:h-12 text-center font-bold text-base xs:text-lg bg-transparent outline-none rounded-lg xs:rounded-xl border border-transparent focus:border-border focus:bg-background/70"
                   />
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1))}
+                    onClick={() =>
+                      setQuantity((q) => {
+                        const next = Math.min(MAX_QUANTITY, q + 1);
+                        setQuantityText(String(next));
+                        return next;
+                      })
+                    }
                     className="w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-lg xs:rounded-xl flex items-center justify-center hover:bg-background transition-colors"
                   >
                     <Plus className="w-4 h-4 xs:w-5 xs:h-5" />
@@ -334,7 +360,7 @@ const ProductQuickPreview = memo(({ product, open, onOpenChange }: ProductQuickP
                 ) : inCart ? (
                   <>
                     <Check className="w-5 h-5 xs:w-6 xs:h-6" />
-                    <span>U korpi ({currentQuantity}) - Dodaj još {quantity}</span>
+                    <span>U korpi ({currentQuantity}) - Dodaj još {quantityText === "" ? 1 : quantity}</span>
                   </>
                 ) : (
                   <>

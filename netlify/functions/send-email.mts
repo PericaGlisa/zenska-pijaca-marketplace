@@ -3,6 +3,15 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const parseRecipients = (value: string | undefined, fallback: string[]) => {
+  if (!value) return fallback;
+  const recipients = value
+    .split(/[,\s;]+/g)
+    .map((v) => v.trim())
+    .filter(Boolean);
+  return recipients.length > 0 ? recipients : fallback;
+};
+
 export default async (req: Request, context: Context) => {
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
@@ -14,9 +23,11 @@ export default async (req: Request, context: Context) => {
 
     let subject = "";
     let html = "";
-    // Use CONTACT_EMAIL from env or fallback to a default
-    // Note: In Resend Sandbox, you can only send TO your verified email address
-    const to = process.env.CONTACT_EMAIL || "info@zenskapijaca.rs"; 
+    const fallbackRecipients = ["info@zenskapijaca.rs"];
+    const to =
+      type === "order"
+        ? parseRecipients(process.env.ORDER_EMAILS || process.env.CONTACT_EMAIL, fallbackRecipients)
+        : parseRecipients(process.env.CONTACT_EMAILS || process.env.CONTACT_EMAIL, fallbackRecipients);
 
     if (type === "contact") {
       subject = `Nova poruka: ${data.subject}`;
@@ -61,7 +72,7 @@ export default async (req: Request, context: Context) => {
 
     const { data: emailData, error } = await resend.emails.send({
       from: "Ženska Pijaca <info@zenskapijaca.rs>",
-      to: [to],
+      to,
       subject,
       html,
       reply_to: data.email || data.customerEmail,

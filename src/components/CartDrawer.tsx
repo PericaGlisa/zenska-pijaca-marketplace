@@ -217,11 +217,14 @@ const shippingRates: Record<string, number> = {
   "14226": 400,
 };
 
+const MAX_QUANTITY = 9999;
+
 const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
   const navigate = useNavigate();
   const { items, removeItem, updateQuantity, clearCart, getTotalPrice } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [quantityInputs, setQuantityInputs] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     customerName: "",
     customerEmail: "",
@@ -237,6 +240,56 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
   const shippingPrice = isPostalCodeValid ? shippingRates[postalCodeValue] ?? 350 : undefined;
   const totalWithShipping = itemsTotal + (shippingPrice ?? 0);
   const totalDisplay = shippingPrice !== undefined ? totalWithShipping : itemsTotal;
+  const clampQuantity = (value: number) => {
+    const parsed = Math.floor(Number(value));
+    const safe = Number.isFinite(parsed) ? parsed : 1;
+    return Math.min(MAX_QUANTITY, Math.max(1, safe));
+  };
+
+  useEffect(() => {
+    setQuantityInputs((prev) => {
+      const next: Record<string, string> = { ...prev };
+
+      items.forEach((item) => {
+        if (next[item.id] === "") return;
+        if (next[item.id] !== String(item.quantity)) {
+          next[item.id] = String(item.quantity);
+        }
+      });
+
+      Object.keys(next).forEach((id) => {
+        if (!items.some((item) => item.id === id)) {
+          delete next[id];
+        }
+      });
+
+      return next;
+    });
+  }, [items]);
+
+  const setQuantityInput = (itemId: string, value: string) => {
+    setQuantityInputs((prev) => ({ ...prev, [itemId]: value }));
+  };
+
+  const handleQuantityInputChange = (itemId: string, raw: string) => {
+    const nextText = raw.replace(/[^\d]/g, "");
+    setQuantityInput(itemId, nextText);
+    if (nextText === "") return;
+    updateQuantity(itemId, clampQuantity(Number(nextText)));
+  };
+
+  const commitQuantityInput = (itemId: string) => {
+    const text = quantityInputs[itemId] ?? "";
+    const nextQty = text === "" ? 1 : clampQuantity(Number(text));
+    updateQuantity(itemId, nextQty);
+    setQuantityInput(itemId, String(nextQty));
+  };
+
+  const applyQuantity = (itemId: string, nextQty: number) => {
+    const clamped = clampQuantity(nextQty);
+    updateQuantity(itemId, clamped);
+    setQuantityInput(itemId, String(clamped));
+  };
 
   // Disable body scroll when cart is open
   useEffect(() => {
@@ -444,7 +497,7 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                   onChange={(e) =>
                     setFormData({ ...formData, customerPhone: e.target.value })
                   }
-                  placeholder="+381 64 827 8384"
+                  placeholder="+381621029770"
                   required
                   maxLength={20}
                 />
@@ -512,11 +565,45 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
               <div className="bg-muted rounded-lg p-4 space-y-2">
                 <h3 className="font-medium">Rezime narudžbe</h3>
                 {items.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span>
-                      {item.name} x{item.quantity}
-                    </span>
-                    <span>{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
+                  <div key={item.id} className="flex items-center justify-between gap-2 text-sm">
+                    <div className="min-w-0">
+                      <span className="line-clamp-1">{item.name}</span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          type="button"
+                          onClick={() => applyQuantity(item.id, item.quantity - 1)}
+                          className="p-1 hover:bg-muted rounded"
+                          aria-label="Smanji količinu"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <input
+                          type="number"
+                          min={1}
+                          max={MAX_QUANTITY}
+                          step={1}
+                          inputMode="numeric"
+                          value={quantityInputs[item.id] ?? String(item.quantity)}
+                          onChange={(e) => handleQuantityInputChange(item.id, e.target.value)}
+                          onBlur={() => commitQuantityInput(item.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          className="w-16 text-center font-medium bg-transparent outline-none rounded border border-transparent focus:border-border focus:bg-background/70"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => applyQuantity(item.id, item.quantity + 1)}
+                          className="p-1 hover:bg-muted rounded"
+                          aria-label="Povećaj količinu"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <span className="shrink-0">{(item.price * item.quantity).toLocaleString("sr-RS")} RSD</span>
                   </div>
                 ))}
                 <div className="border-t border-border pt-2 mt-2 flex justify-between text-sm">
@@ -561,24 +648,43 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          type="button"
+                          onClick={() => applyQuantity(item.id, item.quantity - 1)}
                           className="p-1 hover:bg-muted rounded"
+                          aria-label="Smanji količinu"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
-                        <span className="w-8 text-center font-medium">
-                          {item.quantity}
-                        </span>
+                        <input
+                          type="number"
+                          min={1}
+                          max={MAX_QUANTITY}
+                          step={1}
+                          inputMode="numeric"
+                          value={quantityInputs[item.id] ?? String(item.quantity)}
+                          onChange={(e) => handleQuantityInputChange(item.id, e.target.value)}
+                          onBlur={() => commitQuantityInput(item.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          className="w-16 text-center font-medium bg-transparent outline-none rounded border border-transparent focus:border-border focus:bg-background/70"
+                        />
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          type="button"
+                          onClick={() => applyQuantity(item.id, item.quantity + 1)}
                           className="p-1 hover:bg-muted rounded"
+                          aria-label="Povećaj količinu"
                         >
                           <Plus className="w-4 h-4" />
                         </button>
                       </div>
                       <button
+                        type="button"
                         onClick={() => removeItem(item.id)}
                         className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                        aria-label="Ukloni iz korpe"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
