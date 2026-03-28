@@ -1,7 +1,20 @@
 import { Resend } from "resend";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { getStore } from "@netlify/blobs";
+import fontkit from "@pdf-lib/fontkit";
+import { PDFDocument, rgb } from "pdf-lib";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const invoiceStore = getStore({ name: "invoice-sequence-store" });
+const assetCache = new Map<string, Uint8Array>();
+
+const BRAND = {
+  primary: rgb(0.50, 0.64, 0.29),
+  primaryDark: rgb(0.12, 0.17, 0.11),
+  accent: rgb(0.94, 0.89, 0.78),
+  text: rgb(0.13, 0.13, 0.13),
+  mutedText: rgb(0.38, 0.38, 0.38),
+  border: rgb(0.89, 0.89, 0.89),
+};
 
 type EmailType = "contact" | "newsletter" | "order";
 
@@ -58,25 +71,33 @@ const formatCurrency = (amount: number) =>
     maximumFractionDigits: 0,
   }).format(amount);
 
-const toPdfSafeText = (value: string) =>
-  value
-    .replace(/đ/g, "dj")
-    .replace(/Đ/g, "Dj")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+const fetchAsset = async (url: string) => {
+  if (assetCache.has(url)) return assetCache.get(url)!;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to fetch asset: ${url}`);
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  assetCache.set(url, bytes);
+  return bytes;
+};
+
+const getInvoiceNumber = async () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const prefix = process.env.INVOICE_PREFIX || "ZP";
+  const key = `invoice-seq-${year}`;
+  try {
+    const existing = await invoiceStore.get(key, { type: "text" });
+    const current = Number(existing || "0");
+    const next = Number.isFinite(current) ? current + 1 : 1;
+    await invoiceStore.set(key, String(next));
+    return `${prefix}-${year}-${String(next).padStart(6, "0")}`;
+  } catch {
+    const fallback = `${now.getMonth() + 1}${padNumber(now.getDate())}${padNumber(now.getHours())}${padNumber(now.getMinutes())}${padNumber(now.getSeconds())}`;
+    return `${prefix}-${year}-${fallback}`;
+  }
+};
 
 const padNumber = (value: number) => value.toString().padStart(2, "0");
-
-const createInvoiceNumber = () => {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = padNumber(now.getMonth() + 1);
-  const d = padNumber(now.getDate());
-  const h = padNumber(now.getHours());
-  const min = padNumber(now.getMinutes());
-  const random = Math.floor(Math.random() * 900 + 100);
-  return `ZP-${y}${m}${d}-${h}${min}-${random}`;
-};
 
 const normalizeOrderData = (raw: unknown) => {
   const input = (raw ?? {}) as Partial<OrderData> & { items?: unknown[] };
@@ -165,60 +186,260 @@ const createInvoicePdfBase64 = async (
   invoiceNumber: string,
 ) => {
   const pdfDoc = await PDFDocument.create();
-  const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  pdfDoc.registerFontkit(fontkit);
+
+  const regularFontBytes = await fetchAsset(
+    "https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf",
+  );
+  const boldFontBytes = await fetchAsset(
+    "https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Bold.ttf",
+  );
+  const regularFont = await pdfDoc.embedFont(regularFontBytes, { subset: true });
+  const boldFont = await pdfDoc.embedFont(boldFontBytes, { subset: true });
 
   let page = pdfDoc.addPage([595.28, 841.89]);
   const marginLeft = 50;
-  const maxWidth = 495;
-  let y = 800;
+  const pageWidth = page.getWidth();
+  const pageHeight = page.getHeight();
+  const maxWidth = 495.28;
+  let y = 700;
 
-  const drawLine = (
-    text: string,
-    options: { fontSize?: number; bold?: boolean; color?: ReturnType<typeof rgb>; step?: number } = {},
-  ) => {
-    if (y < 60) {
-      page = pdfDoc.addPage([595.28, 841.89]);
-      y = 800;
-    }
-    page.drawText(toPdfSafeText(text), {
-      x: marginLeft,
-      y,
-      size: options.fontSize ?? 11,
-      font: options.bold ? boldFont : regularFont,
-      color: options.color ?? rgb(0.1, 0.1, 0.1),
-      maxWidth,
-    });
-    y -= options.step ?? 18;
-  };
-
-  drawLine("Ženska Pijaca", { fontSize: 18, bold: true, step: 24 });
-  drawLine("Faktura porudžbine", { fontSize: 13, bold: true });
-  drawLine(`Broj fakture: ${invoiceNumber}`);
-  drawLine(`Datum: ${new Date().toLocaleString("sr-RS")}`, { step: 24 });
-
-  drawLine("Podaci kupca", { bold: true });
-  drawLine(`Ime: ${orderData.customerName}`);
-  drawLine(`Email: ${orderData.customerEmail}`);
-  drawLine(`Telefon: ${orderData.customerPhone}`);
-  drawLine(`Adresa: ${orderData.customerAddress}, ${orderData.customerCity} ${orderData.customerPostalCode}`);
-  drawLine(`Poruka: ${orderData.customerMessage || "-"}`, { step: 24 });
-
-  drawLine("Stavke", { bold: true });
-  orderData.items.forEach((item, index) => {
-    const lineTotal = item.quantity * item.price;
-    drawLine(
-      `${index + 1}. ${item.name} | Količina: ${item.quantity} | Cena: ${formatCurrency(item.price)} | Ukupno: ${formatCurrency(lineTotal)}`,
-    );
+  page.drawRectangle({
+    x: 0,
+    y: pageHeight - 120,
+    width: pageWidth,
+    height: 120,
+    color: BRAND.primaryDark,
+  });
+  page.drawRectangle({
+    x: 0,
+    y: pageHeight - 130,
+    width: pageWidth,
+    height: 10,
+    color: BRAND.primary,
   });
 
-  drawLine("", { step: 10 });
-  drawLine(`Međuzbir: ${formatCurrency(orderData.itemsTotal)}`, { bold: true });
-  drawLine(`Dostava: ${formatCurrency(orderData.shippingPrice)}`, { bold: true });
-  drawLine(`Za naplatu: ${formatCurrency(orderData.totalPrice)}`, {
-    fontSize: 13,
-    bold: true,
-    color: rgb(0.13, 0.35, 0.12),
+  const siteUrl = process.env.URL || process.env.DEPLOY_PRIME_URL || "https://zenskapijaca.rs";
+  const logoUrl = process.env.INVOICE_LOGO_URL || `${siteUrl.replace(/\/$/, "")}/invoice-logo.png`;
+  try {
+    const logoBytes = await fetchAsset(logoUrl);
+    const isPng = logoUrl.toLowerCase().endsWith(".png");
+    const logo = isPng ? await pdfDoc.embedPng(logoBytes) : await pdfDoc.embedJpg(logoBytes);
+    const scaled = logo.scale(42 / logo.height);
+    page.drawImage(logo, {
+      x: marginLeft,
+      y: pageHeight - 90,
+      width: scaled.width,
+      height: 42,
+    });
+  } catch {}
+
+  page.drawText("Ženska Pijaca", {
+    x: marginLeft + 58,
+    y: pageHeight - 62,
+    font: boldFont,
+    size: 20,
+    color: rgb(1, 1, 1),
+  });
+  page.drawText("Memorandumska faktura porudžbine", {
+    x: marginLeft + 58,
+    y: pageHeight - 82,
+    font: regularFont,
+    size: 10.5,
+    color: rgb(0.92, 0.94, 0.92),
+  });
+
+  page.drawText("Ženska Pijaca Marketplace", {
+    x: 360,
+    y: pageHeight - 56,
+    font: boldFont,
+    size: 11,
+    color: rgb(1, 1, 1),
+  });
+  page.drawText("info@zenskapijaca.rs", {
+    x: 360,
+    y: pageHeight - 72,
+    font: regularFont,
+    size: 10,
+    color: rgb(0.90, 0.93, 0.90),
+  });
+  page.drawText("+381621029770", {
+    x: 360,
+    y: pageHeight - 86,
+    font: regularFont,
+    size: 10,
+    color: rgb(0.90, 0.93, 0.90),
+  });
+
+  page.drawRectangle({
+    x: marginLeft,
+    y: y - 50,
+    width: 240,
+    height: 78,
+    borderColor: BRAND.border,
+    borderWidth: 1,
+    color: rgb(1, 1, 1),
+  });
+  page.drawRectangle({
+    x: marginLeft,
+    y: y + 8,
+    width: 240,
+    height: 20,
+    color: BRAND.accent,
+  });
+  page.drawText("PODACI KUPCA", {
+    x: marginLeft + 10,
+    y: y + 14,
+    font: boldFont,
+    size: 9,
+    color: BRAND.primaryDark,
+  });
+
+  page.drawText(orderData.customerName, {
+    x: marginLeft + 10,
+    y: y - 8,
+    font: boldFont,
+    size: 11,
+    color: BRAND.text,
+  });
+  page.drawText(orderData.customerEmail || "-", {
+    x: marginLeft + 10,
+    y: y - 24,
+    font: regularFont,
+    size: 9.5,
+    color: BRAND.mutedText,
+  });
+  page.drawText(orderData.customerPhone || "-", {
+    x: marginLeft + 10,
+    y: y - 38,
+    font: regularFont,
+    size: 9.5,
+    color: BRAND.mutedText,
+  });
+
+  page.drawRectangle({
+    x: 320,
+    y: y - 50,
+    width: 225,
+    height: 78,
+    borderColor: BRAND.border,
+    borderWidth: 1,
+    color: rgb(1, 1, 1),
+  });
+  page.drawText("Broj fakture", {
+    x: 332,
+    y: y + 6,
+    font: regularFont,
+    size: 9,
+    color: BRAND.mutedText,
+  });
+  page.drawText(invoiceNumber, {
+    x: 332,
+    y: y - 10,
+    font: boldFont,
+    size: 13,
+    color: BRAND.primaryDark,
+  });
+  page.drawText("Datum izdavanja", {
+    x: 332,
+    y: y - 28,
+    font: regularFont,
+    size: 9,
+    color: BRAND.mutedText,
+  });
+  page.drawText(new Date().toLocaleString("sr-RS"), {
+    x: 332,
+    y: y - 42,
+    font: boldFont,
+    size: 10,
+    color: BRAND.text,
+  });
+
+  y -= 92;
+  page.drawText(`Adresa dostave: ${orderData.customerAddress}, ${orderData.customerCity} ${orderData.customerPostalCode}`, {
+    x: marginLeft,
+    y,
+    font: regularFont,
+    size: 10,
+    color: BRAND.text,
+    maxWidth,
+  });
+  y -= 16;
+  page.drawText(`Napomena kupca: ${orderData.customerMessage || "-"}`, {
+    x: marginLeft,
+    y,
+    font: regularFont,
+    size: 10,
+    color: BRAND.text,
+    maxWidth,
+  });
+  y -= 24;
+
+  page.drawRectangle({
+    x: marginLeft,
+    y: y - 22,
+    width: maxWidth,
+    height: 24,
+    color: BRAND.primary,
+  });
+  page.drawText("RB", { x: marginLeft + 10, y: y - 14, font: boldFont, size: 9.5, color: rgb(1, 1, 1) });
+  page.drawText("Proizvod", { x: marginLeft + 38, y: y - 14, font: boldFont, size: 9.5, color: rgb(1, 1, 1) });
+  page.drawText("Kol.", { x: marginLeft + 290, y: y - 14, font: boldFont, size: 9.5, color: rgb(1, 1, 1) });
+  page.drawText("Cena", { x: marginLeft + 350, y: y - 14, font: boldFont, size: 9.5, color: rgb(1, 1, 1) });
+  page.drawText("Iznos", { x: marginLeft + 430, y: y - 14, font: boldFont, size: 9.5, color: rgb(1, 1, 1) });
+  y -= 28;
+
+  orderData.items.forEach((item, index) => {
+    const rowHeight = 22;
+    const lineTotal = item.quantity * item.price;
+    const rowColor = index % 2 === 0 ? rgb(1, 1, 1) : rgb(0.98, 0.98, 0.98);
+    page.drawRectangle({
+      x: marginLeft,
+      y: y - rowHeight + 4,
+      width: maxWidth,
+      height: rowHeight,
+      color: rowColor,
+      borderColor: BRAND.border,
+      borderWidth: 0.4,
+    });
+    page.drawText(String(index + 1), { x: marginLeft + 12, y: y - 10, font: regularFont, size: 9.5, color: BRAND.text });
+    page.drawText(item.name, { x: marginLeft + 38, y: y - 10, font: regularFont, size: 9.5, color: BRAND.text, maxWidth: 240 });
+    page.drawText(String(item.quantity), { x: marginLeft + 298, y: y - 10, font: regularFont, size: 9.5, color: BRAND.text });
+    page.drawText(formatCurrency(item.price), { x: marginLeft + 350, y: y - 10, font: regularFont, size: 9.5, color: BRAND.text });
+    page.drawText(formatCurrency(lineTotal), { x: marginLeft + 430, y: y - 10, font: boldFont, size: 9.5, color: BRAND.primaryDark });
+    y -= rowHeight;
+  });
+
+  y -= 10;
+  page.drawRectangle({
+    x: 328,
+    y: y - 62,
+    width: 217,
+    height: 72,
+    color: rgb(0.99, 0.99, 0.99),
+    borderColor: BRAND.border,
+    borderWidth: 1,
+  });
+  page.drawText("Međuzbir", { x: 340, y: y - 8, font: regularFont, size: 10, color: BRAND.mutedText });
+  page.drawText(formatCurrency(orderData.itemsTotal), { x: 456, y: y - 8, font: boldFont, size: 10, color: BRAND.text });
+  page.drawText("Dostava", { x: 340, y: y - 26, font: regularFont, size: 10, color: BRAND.mutedText });
+  page.drawText(formatCurrency(orderData.shippingPrice), { x: 456, y: y - 26, font: boldFont, size: 10, color: BRAND.text });
+  page.drawText("Ukupno za naplatu", { x: 340, y: y - 46, font: boldFont, size: 11, color: BRAND.primaryDark });
+  page.drawText(formatCurrency(orderData.totalPrice), { x: 456, y: y - 46, font: boldFont, size: 11, color: BRAND.primaryDark });
+
+  page.drawText("Hvala Vam što podržavate lokalne proizvođačice.", {
+    x: marginLeft,
+    y: 52,
+    font: regularFont,
+    size: 10,
+    color: BRAND.mutedText,
+  });
+  page.drawText("Ženska Pijaca", {
+    x: marginLeft,
+    y: 38,
+    font: boldFont,
+    size: 11,
+    color: BRAND.primaryDark,
   });
 
   const pdfBytes = await pdfDoc.save();
@@ -258,7 +479,7 @@ export default async (req: Request) => {
       html = `<p>Korisnik <strong>${data.email}</strong> se prijavio za newsletter.</p>`;
     } else if (type === "order") {
       const orderData = normalizeOrderData(data);
-      const invoiceNumber = createInvoiceNumber();
+      const invoiceNumber = await getInvoiceNumber();
       subject = `Nova narudžbina - ${invoiceNumber}`;
       html = createInvoiceHtml(orderData, invoiceNumber);
       attachments = [
