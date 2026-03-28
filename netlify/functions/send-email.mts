@@ -80,6 +80,18 @@ const fetchAsset = async (url: string) => {
   return bytes;
 };
 
+let invoiceFontBytesPromise: Promise<{ regular: Uint8Array; bold: Uint8Array }> | null = null;
+
+const getInvoiceFontBytes = () => {
+  if (!invoiceFontBytesPromise) {
+    invoiceFontBytesPromise = Promise.all([
+      fetchAsset("https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf"),
+      fetchAsset("https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Bold.ttf"),
+    ]).then(([regular, bold]) => ({ regular, bold }));
+  }
+  return invoiceFontBytesPromise;
+};
+
 const getInvoiceNumber = async () => {
   const now = new Date();
   const year = now.getFullYear();
@@ -188,12 +200,7 @@ const createInvoicePdfBase64 = async (
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
-  const regularFontBytes = await fetchAsset(
-    "https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf",
-  );
-  const boldFontBytes = await fetchAsset(
-    "https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Bold.ttf",
-  );
+  const { regular: regularFontBytes, bold: boldFontBytes } = await getInvoiceFontBytes();
   const regularFont = await pdfDoc.embedFont(regularFontBytes, { subset: true });
   const boldFont = await pdfDoc.embedFont(boldFontBytes, { subset: true });
 
@@ -220,19 +227,28 @@ const createInvoicePdfBase64 = async (
   });
 
   const siteUrl = process.env.URL || process.env.DEPLOY_PRIME_URL || "https://zenskapijaca.rs";
-  const logoUrl = process.env.INVOICE_LOGO_URL || `${siteUrl.replace(/\/$/, "")}/invoice-logo.png`;
-  try {
-    const logoBytes = await fetchAsset(logoUrl);
-    const isPng = logoUrl.toLowerCase().endsWith(".png");
-    const logo = isPng ? await pdfDoc.embedPng(logoBytes) : await pdfDoc.embedJpg(logoBytes);
-    const scaled = logo.scale(42 / logo.height);
-    page.drawImage(logo, {
-      x: marginLeft,
-      y: pageHeight - 90,
-      width: scaled.width,
-      height: 42,
-    });
-  } catch {}
+  const baseUrl = siteUrl.replace(/\/$/, "");
+  const logoCandidates = [
+    process.env.INVOICE_LOGO_URL,
+    `${baseUrl}/invoice-logo.png`,
+    `${baseUrl}/logo-zenska-pijaca.png`,
+    `${baseUrl}/favicon.png`,
+  ].filter(Boolean) as string[];
+  for (const logoUrl of logoCandidates) {
+    try {
+      const logoBytes = await fetchAsset(logoUrl);
+      const isPng = logoUrl.toLowerCase().endsWith(".png");
+      const logo = isPng ? await pdfDoc.embedPng(logoBytes) : await pdfDoc.embedJpg(logoBytes);
+      const scaled = logo.scale(56 / logo.height);
+      page.drawImage(logo, {
+        x: marginLeft,
+        y: pageHeight - 98,
+        width: scaled.width,
+        height: 56,
+      });
+      break;
+    } catch {}
+  }
 
   page.drawText("Ženska Pijaca", {
     x: marginLeft + 58,
@@ -459,6 +475,7 @@ export default async (req: Request) => {
     let subject = "";
     let html = "";
     let attachments: Array<{ filename: string; content: string }> = [];
+    let customerEmailPayload: { to: string[]; subject: string; html: string } | null = null;
     const fallbackRecipients = ["info@zenskapijaca.rs"];
     const to =
       type === "order"
@@ -488,28 +505,7 @@ export default async (req: Request) => {
           content: await createInvoicePdfBase64(orderData, invoiceNumber),
         },
       ];
-    } else {
-      return new Response("Invalid email type", { status: 400 });
-    }
-
-    const { data: emailData, error } = await resend.emails.send({
-      from: "Ženska Pijaca <info@zenskapijaca.rs>",
-      to,
-      subject,
-      html,
-      attachments,
-      reply_to: data.email || data.customerEmail,
-    });
-
-    if (error) {
-      console.error("Resend error:", error);
-      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
-    }
-
-    // --- Send Confirmation Email to Customer (if it's an order) ---
-    if (type === "order" && data.customerEmail) {
-      try {
-        const orderData = normalizeOrderData(data);
+      if (orderData.customerEmail) {
         const customerSubject = "Potvrda narudžbine - Ženska Pijaca";
         const customerItemsTotalLine = `<p><strong>Međuzbir:</strong> ${formatCurrency(orderData.itemsTotal)}</p>`;
         const customerShippingLine = `<p><strong>Dostava:</strong> ${formatCurrency(orderData.shippingPrice)}</p>`;
@@ -527,21 +523,45 @@ export default async (req: Request) => {
           <hr>
           <p><small>Ovo je automatska poruka. Molimo vas da ne odgovarate na nju.</small></p>
         `;
-
-        await resend.emails.send({
-          from: "Ženska Pijaca <info@zenskapijaca.rs>",
-          to: [data.customerEmail],
+        customerEmailPayload = {
+          to: [orderData.customerEmail],
           subject: customerSubject,
           html: customerHtml,
-        });
-        console.log("Confirmation email sent to:", data.customerEmail);
-      } catch (custError) {
-        // We do NOT want to fail the request if the customer email fails 
-        // (common in Resend Sandbox if sending to unverified emails)
-        console.warn("Failed to send confirmation email (likely Resend Sandbox limitation):", custError);
+        };
       }
+    } else {
+      return new Response("Invalid email type", { status: 400 });
     }
-    // ---------------------------------------------------------------
+
+    const adminEmailPromise = resend.emails.send({
+      from: "Ženska Pijaca <info@zenskapijaca.rs>",
+      to,
+      subject,
+      html,
+      attachments,
+      reply_to: (data.email as string) || (data.customerEmail as string),
+    });
+
+    const customerEmailPromise = customerEmailPayload
+      ? resend.emails
+          .send({
+            from: "Ženska Pijaca <info@zenskapijaca.rs>",
+            to: customerEmailPayload.to,
+            subject: customerEmailPayload.subject,
+            html: customerEmailPayload.html,
+          })
+          .catch((custError) => {
+            console.warn("Customer confirmation email failed:", custError);
+            return null;
+          })
+      : Promise.resolve(null);
+
+    const [{ data: emailData, error }] = await Promise.all([adminEmailPromise, customerEmailPromise]);
+
+    if (error) {
+      console.error("Resend error:", error);
+      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    }
 
     return new Response(JSON.stringify(emailData), { status: 200 });
   } catch (error: any) {
