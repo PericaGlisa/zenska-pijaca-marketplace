@@ -227,7 +227,7 @@ const createInvoicePdfBase64 = async (
   });
 
   const siteUrl = process.env.URL || process.env.DEPLOY_PRIME_URL || "https://zenskapijaca.rs";
-  const invoiceLogoUrl = `${siteUrl.replace(/\/$/, "")}/invoice-logo.png`;
+  const invoiceLogoUrl = `${siteUrl.replace(/\/$/, "")}/faktura-logo.png`;
   try {
     const logoBytes = await fetchAsset(invoiceLogoUrl);
     const logo = await pdfDoc.embedPng(logoBytes);
