@@ -227,28 +227,18 @@ const createInvoicePdfBase64 = async (
   });
 
   const siteUrl = process.env.URL || process.env.DEPLOY_PRIME_URL || "https://zenskapijaca.rs";
-  const baseUrl = siteUrl.replace(/\/$/, "");
-  const logoCandidates = [
-    process.env.INVOICE_LOGO_URL,
-    `${baseUrl}/invoice-logo.png`,
-    `${baseUrl}/logo-zenska-pijaca.png`,
-    `${baseUrl}/favicon.png`,
-  ].filter(Boolean) as string[];
-  for (const logoUrl of logoCandidates) {
-    try {
-      const logoBytes = await fetchAsset(logoUrl);
-      const isPng = logoUrl.toLowerCase().endsWith(".png");
-      const logo = isPng ? await pdfDoc.embedPng(logoBytes) : await pdfDoc.embedJpg(logoBytes);
-      const scaled = logo.scale(56 / logo.height);
-      page.drawImage(logo, {
-        x: marginLeft,
-        y: pageHeight - 98,
-        width: scaled.width,
-        height: 56,
-      });
-      break;
-    } catch {}
-  }
+  const invoiceLogoUrl = `${siteUrl.replace(/\/$/, "")}/invoice-logo.png`;
+  try {
+    const logoBytes = await fetchAsset(invoiceLogoUrl);
+    const logo = await pdfDoc.embedPng(logoBytes);
+    const scaled = logo.scale(56 / logo.height);
+    page.drawImage(logo, {
+      x: marginLeft,
+      y: pageHeight - 98,
+      width: scaled.width,
+      height: 56,
+    });
+  } catch {}
 
   page.drawText("Ženska Pijaca", {
     x: marginLeft + 58,
